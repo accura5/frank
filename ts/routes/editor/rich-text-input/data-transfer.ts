@@ -19,6 +19,7 @@ import * as tr from "@generated/ftl";
 import { bridgeCommand } from "@tslib/bridgecommand";
 import { shiftPressed } from "@tslib/keys";
 import { pasteHTML } from "../old-editor-adapter";
+import DOMPurify from "dompurify";
 
 type ImageData = string | Uint8Array;
 const imageSuffixes = ["jpg", "jpeg", "png", "gif", "svg", "webp", "ico", "avif"];
@@ -366,8 +367,11 @@ async function processDataTransferEvent(
 }
 
 async function runPreFilter(html: string, internal = false): Promise<string> {
+    const sanitizedHtml = DOMPurify.sanitize(html, {
+        ALLOWED_URI_REGEXP: /^(?:(?:https?|mailto|ftp|tel|file|data):|[^a-z]|[a-z+.\-]+(?:[^a-z+.\-:]|$))/i,
+    });
     const template = document.createElement("template");
-    template.innerHTML = html;
+    template.innerHTML = sanitizedHtml;
     const content = template.content;
     for (const img of content.querySelectorAll("img")) {
         let src = img.getAttribute("src");
