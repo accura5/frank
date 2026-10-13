@@ -34,10 +34,8 @@ export function gatherData(data: GraphsResponse): GraphData {
 
 function makeQuery(start: number, end: number): string {
     const fromQuery = `"prop:r>=${start / 100}"`;
-    let tillQuery = `"prop:r<${(end + 1) / 100}"`;
-    if (end === 99) {
-        tillQuery = tillQuery.replace("<", "<=");
-    }
+    const upperOp = end === 99 ? "<=" : "<";
+    const tillQuery = `"prop:r${upperOp}${(end + 1) / 100}"`;
     return `${fromQuery} AND ${tillQuery}`;
 }
 
